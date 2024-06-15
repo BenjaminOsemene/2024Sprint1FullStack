@@ -1,3 +1,4 @@
+//Imported required modules
 const readline = require('readline');
 const { loadConfig, saveConfig } = require('./modules/config');
 const { loadUsers, saveUsers } = require('./modules/users');
@@ -16,6 +17,16 @@ const init = () => {
   }
 };
 
+// Function to display current configuration
+const viewConfig = () => {
+  const config = loadConfig();
+  const users = loadUsers();
+
+  console.log('Current Configuration:');
+  console.log('Config:', config);
+  console.log('Users:', users);
+};
+
 // Command-line interface
 const rl = readline.createInterface({
   input: process.stdin,
@@ -26,7 +37,8 @@ const showMenu = () => {
   console.log('Welcome to the Application Setup CLI');
   console.log('Please select an option:');
   console.log('1. Initialize and configure application');
-  console.log('2. Exit');
+  console.log('2. View current configuration');
+  console.log('3. Exit');
 
   rl.question('Enter your choice: ', (choice) => {
     switch (choice) {
@@ -34,15 +46,19 @@ const showMenu = () => {
         console.log('Initializing and configuring application...');
         init();
         console.log('Initialization and configuration completed successfully!');
-       showMenu();
+        showMenu();
         break;
       case '2':
+        viewConfig();
+        showMenu();
+        break;
+      case '3':
         console.log('Exiting...');
         rl.close();
         break;
       default:
         console.log('Invalid choice. Please try again.');
-       showMenu();
+        showMenu();
         break;
     }
   });
