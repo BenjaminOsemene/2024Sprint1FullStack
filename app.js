@@ -3,7 +3,7 @@ const readline = require('readline');
 const { loadConfig, saveConfig } = require('./modules/config');
 const { loadUsers, saveUsers } = require('./modules/users');
 const { logEvent } = require('./modules/logger');
-const { generateUserToken } = require('./token'); 
+const { generateUserToken } = require('./token');
 
 // Default configuration
 const defaultConfig = { appName: 'myapp', version: '1.0.0' };
@@ -32,7 +32,6 @@ const viewConfig = () => {
 
 // Function to update configuration
 const updateConfig = () => {
-  
 };
 
 // Function to reset configuration
@@ -60,10 +59,60 @@ const generateToken = () => {
       return;
     }
 
-    const token = generateUserToken(user); 
+    const token = generateUserToken(user);
     console.log(`Token for user "${username}": ${token}`);
+
+    // Saving  the token to the user object
+    user.token = token;
+
+    // Saving the updated users array to the users.json file
+    saveUsers(users);
+
     rl.close();
     showMenu();
+  });
+};
+
+// Function to add/update user contact information
+const addUpdateUser = () => {
+  const users = loadUsers();
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  rl.question('Enter username: ', (username) => {
+    const user = users.find(u => u.username === username);
+    if (!user) {
+      console.log(`User "${username}" not found. Creating new user...`);
+      const newUser = { username };
+      rl.question('Enter email (optional): ', (email) => {
+        if (email) newUser.email = email;
+        rl.question('Enter phone number (optional): ', (phone) => {
+          if (phone) newUser.phone = phone;
+          users.push(newUser);
+          saveUsers(users);
+          console.log(`User "${username}" added/updated successfully!`);
+          rl.close();
+          showMenu();
+        });
+      });
+    } else {
+      console.log(`User "${username}" found.`);
+      rl.question('Enter new email (leave blank to keep current): ', (email) => {
+        if (email) user.email = email;
+        else if (user.email) console.log(`Current email: ${user.email}`);
+        rl.question('Enter new phone number (leave blank to keep current): ', (phone) => {
+          if (phone) user.phone = phone;
+          else if (user.phone) console.log(`Current phone number: ${user.phone}`);
+          saveUsers(users);
+          console.log(`User "${username}" updated successfully!`);
+          rl.close();
+          showMenu();
+        });
+      });
+    }
   });
 };
 
@@ -81,7 +130,8 @@ const showMenu = () => {
   console.log('3. Update configuration');
   console.log('4. Reset configuration to default');
   console.log('5. Generate user token');
-  console.log('6. Exit');
+  console.log('6. Add/Update user contact information');
+  console.log('7. Exit');
 
   rl.question('Enter your choice: ', (choice) => {
     switch (choice) {
@@ -105,6 +155,9 @@ const showMenu = () => {
         generateToken();
         break;
       case '6':
+        addUpdateUser();
+        break;
+      case '7':
         console.log('Exiting...');
         rl.close();
         break;
