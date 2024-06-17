@@ -4,10 +4,12 @@ const { loadConfig, saveConfig } = require('./modules/config');
 const { loadUsers, saveUsers } = require('./modules/users');
 const { logEvent } = require('./modules/logger');
 
+// Default configuration
+const defaultConfig = { appName: 'myapp', version: '1.0.0' };
+
 // Function to initialize application
 const init = () => {
   try {
-    const defaultConfig = { appName: 'myapp', version: '1.0.0' };
     saveConfig(defaultConfig);
     saveUsers([]);
     logEvent('Application initialized');
@@ -54,6 +56,13 @@ const updateConfig = () => {
   });
 };
 
+// Function to reset configuration
+const resetConfig = () => {
+  saveConfig(defaultConfig);
+  console.log('Configuration reset to default values successfully!');
+  showMenu();
+};
+
 // Command-line interface
 const rl = readline.createInterface({
   input: process.stdin,
@@ -66,7 +75,8 @@ const showMenu = () => {
   console.log('1. Initialize and configure application');
   console.log('2. View current configuration');
   console.log('3. Update configuration');
-  console.log('4. Exit');
+  console.log('4. Reset configuration to default');
+  console.log('5. Exit');
 
   rl.question('Enter your choice: ', (choice) => {
     switch (choice) {
@@ -84,6 +94,9 @@ const showMenu = () => {
         updateConfig();
         break;
       case '4':
+        resetConfig();
+        break;
+      case '5':
         console.log('Exiting...');
         rl.close();
         break;
