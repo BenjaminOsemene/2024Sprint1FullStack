@@ -62,10 +62,10 @@ const generateToken = () => {
     const token = generateUserToken(user);
     console.log(`Token for user "${username}": ${token}`);
 
-    // Saving  the token to the user object
+    // Save the token to the user object
     user.token = token;
 
-    // Saving the updated users array to the users.json file
+    // Save the updated users array to the users.json file
     saveUsers(users);
 
     rl.close();
@@ -116,6 +116,35 @@ const addUpdateUser = () => {
   });
 };
 
+// Function to search for a user
+const searchUser = () => {
+  const users = loadUsers();
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  rl.question('Enter username, email, or phone number: ', (query) => {
+    const user = users.find(
+      (u) =>
+        u.username === query ||
+        u.email === query ||
+        u.phone === query
+    );
+
+    if (!user) {
+      console.log(`No user found with the provided query: ${query}`);
+    } else {
+      console.log(`User found:`);
+      console.log(user);
+    }
+
+    rl.close();
+    showMenu();
+  });
+};
+
 // Command-line interface
 const rl = readline.createInterface({
   input: process.stdin,
@@ -131,7 +160,8 @@ const showMenu = () => {
   console.log('4. Reset configuration to default');
   console.log('5. Generate user token');
   console.log('6. Add/Update user contact information');
-  console.log('7. Exit');
+  console.log('7. Search for a user');
+  console.log('8. Exit');
 
   rl.question('Enter your choice: ', (choice) => {
     switch (choice) {
@@ -158,6 +188,9 @@ const showMenu = () => {
         addUpdateUser();
         break;
       case '7':
+        searchUser();
+        break;
+      case '8':
         console.log('Exiting...');
         rl.close();
         break;
