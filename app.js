@@ -3,6 +3,7 @@ const readline = require('readline');
 const { loadConfig, saveConfig } = require('./modules/config');
 const { loadUsers, saveUsers } = require('./modules/users');
 const { logEvent } = require('./modules/logger');
+const { generateUserToken } = require('./token'); 
 
 // Default configuration
 const defaultConfig = { appName: 'myapp', version: '1.0.0' };
@@ -31,29 +32,7 @@ const viewConfig = () => {
 
 // Function to update configuration
 const updateConfig = () => {
-  const config = loadConfig();
-
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-
-  rl.question('Enter new app name (or leave blank to keep current): ', (appName) => {
-    if (appName.trim() !== '') {
-      config.appName = appName.trim();
-    }
-
-    rl.question('Enter new version (or leave blank to keep current): ', (version) => {
-      if (version.trim() !== '') {
-        config.version = version.trim();
-      }
-
-      saveConfig(config);
-      console.log('Configuration updated successfully!');
-      rl.close();
-      showMenu();
-    });
-  });
+  
 };
 
 // Function to reset configuration
@@ -61,6 +40,31 @@ const resetConfig = () => {
   saveConfig(defaultConfig);
   console.log('Configuration reset to default values successfully!');
   showMenu();
+};
+
+// Function to generate user token using imported generateUserToken function
+const generateToken = () => {
+  const users = loadUsers();
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  rl.question('Enter username: ', (username) => {
+    const user = users.find(u => u.username === username);
+    if (!user) {
+      console.log(`User "${username}" not found.`);
+      rl.close();
+      showMenu();
+      return;
+    }
+
+    const token = generateUserToken(user); 
+    console.log(`Token for user "${username}": ${token}`);
+    rl.close();
+    showMenu();
+  });
 };
 
 // Command-line interface
@@ -76,7 +80,8 @@ const showMenu = () => {
   console.log('2. View current configuration');
   console.log('3. Update configuration');
   console.log('4. Reset configuration to default');
-  console.log('5. Exit');
+  console.log('5. Generate user token');
+  console.log('6. Exit');
 
   rl.question('Enter your choice: ', (choice) => {
     switch (choice) {
@@ -97,6 +102,9 @@ const showMenu = () => {
         resetConfig();
         break;
       case '5':
+        generateToken();
+        break;
+      case '6':
         console.log('Exiting...');
         rl.close();
         break;
