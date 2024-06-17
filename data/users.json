@@ -1,15 +1,22 @@
 [
   {
-    "username": "ben_doe"
+    "username": "ben_boe",
+    "email": "ben.boe@example.com",
+    "phone": "7234567890",
+    "token": "token_for_ben_boe"
   },
   {
-    "username": "ben_smith"
+    "username": "ben_pike",
+    "email": "ben.pike@example.com",
+    "phone": "1987654321"
   },
   {
-    "username": "ben_johnson"
+    "username": "ben_john",
+    "email": "ben.john@example.com"
   },
   {
-    "username": "ben_wilson"
+    "username": "ben_white",
+    "phone": "4551234567"
   },
   {
     "username": "ben_brown"
