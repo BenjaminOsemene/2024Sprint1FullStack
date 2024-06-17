@@ -1,4 +1,4 @@
-//Imported required modules
+// Imported required modules
 const readline = require('readline');
 const { loadConfig, saveConfig } = require('./modules/config');
 const { loadUsers, saveUsers } = require('./modules/users');
@@ -27,6 +27,33 @@ const viewConfig = () => {
   console.log('Users:', users);
 };
 
+// Function to update configuration
+const updateConfig = () => {
+  const config = loadConfig();
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  rl.question('Enter new app name (or leave blank to keep current): ', (appName) => {
+    if (appName.trim() !== '') {
+      config.appName = appName.trim();
+    }
+
+    rl.question('Enter new version (or leave blank to keep current): ', (version) => {
+      if (version.trim() !== '') {
+        config.version = version.trim();
+      }
+
+      saveConfig(config);
+      console.log('Configuration updated successfully!');
+      rl.close();
+      showMenu();
+    });
+  });
+};
+
 // Command-line interface
 const rl = readline.createInterface({
   input: process.stdin,
@@ -38,7 +65,8 @@ const showMenu = () => {
   console.log('Please select an option:');
   console.log('1. Initialize and configure application');
   console.log('2. View current configuration');
-  console.log('3. Exit');
+  console.log('3. Update configuration');
+  console.log('4. Exit');
 
   rl.question('Enter your choice: ', (choice) => {
     switch (choice) {
@@ -53,6 +81,9 @@ const showMenu = () => {
         showMenu();
         break;
       case '3':
+        updateConfig();
+        break;
+      case '4':
         console.log('Exiting...');
         rl.close();
         break;
