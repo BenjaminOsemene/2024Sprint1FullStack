@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "username": "ben_doe"
+  },
+  {
+    "username": "ben_smith"
+  },
+  {
+    "username": "ben_johnson"
+  },
+  {
+    "username": "ben_wilson"
+  },
+  {
+    "username": "ben_brown"
+  }
+]
