@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>New Membership Registration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    form {
+      display: inline-block;
+      text-align: left;
+    }
+    input[type="text"] {
+      padding: 5px;
+      font-size: 16px;
+    }
+    button {
+      padding: 5px 10px;
+      font-size: 16px;
+    }
+    #token {
+      font-weight: bold;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1>New Membership Registration</h1>
+  <form>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <br><br>
+    <button type="button" onclick="generateToken()">Submit</button>
+  </form>
+  <p id="tokenDisplay"></p>
+
+  <script>
+    function generateToken() {
+      const username = document.getElementById('username').value;
+
+      fetch(`/register?username=${username}`, {
+        method: 'POST'
+      })
+      .then(response => response.text())
+      .then(token => {
+        const tokenDisplay = document.getElementById('tokenDisplay');
+        tokenDisplay.innerHTML = `Your token is: <span id="token">${token}</span>`;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+
+
