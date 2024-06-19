@@ -1,65 +1,253 @@
-// Imported required modules
-const readline = require('readline');
-const { loadConfig, saveConfig } = require('./modules/config');
-const { loadUsers, saveUsers } = require('./modules/users');
-const { logEvent } = require('./modules/logger');
-const { generateUserToken } = require('./token');
+//Imported required modules
+const fs = require('fs');
+const path = require('path');
+const { generateToken } = require('./token');
 
-// Default configuration
-const defaultConfig = { appName: 'myapp', version: '1.0.0' };
+const configFilePath = path.join(__dirname, 'config.json');
+const usersFilePath = path.join(__dirname, 'users.json');
+const defaultConfig = {
+  appName: 'My Application',
+  version: '1.0.0',
+};
 
-// Function to initialize application
-const init = () => {
-  try {
-    saveConfig(defaultConfig);
-    saveUsers([]);
-    logEvent('Application initialized');
-    console.log('Application initialized');
-  } catch (err) {
-    console.error('Error initializing application', err);
+// Load configuration from the config.json file
+const loadConfig = () => {
+  if (fs.existsSync(configFilePath)) {
+    return JSON.parse(fs.readFileSync(configFilePath, 'utf8'));
+  }
+  return defaultConfig;
+};
+
+// Save configuration to the config.json file
+const saveConfig = (config) => {
+  fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2));
+};
+
+// Load users from the users.json file
+const loadUsers = () => {
+  if (fs.existsSync(usersFilePath)) {
+    return JSON.parse(fs.readFileSync(usersFilePath, 'utf8'));
+  }
+  return [];
+};
+
+// Save users to the users.json file
+const saveUsers = (users) => {
+  fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+};
+
+// Handle the available commands
+const handleCommand = (command, options) => {
+  switch (command) {
+    case 'init':
+      initializeApplication();
+      break;
+    case 'config':
+      handleConfigCommand(options);
+      break;
+    case 'token':
+      handleTokenCommand(options);
+      break;
+    default:
+      console.error(`Error: Invalid command "${command}"`);
   }
 };
 
-// Function to display current configuration
-const viewConfig = () => {
+// Initialize the application
+const initializeApplication = () => {
   const config = loadConfig();
+  console.log('Initializing application...');
+  console.log(`Application name: ${config.appName}`);
+  console.log(`Application version: ${config.version}`);
+
+  // Create required directories and files
+  const dirPath = path.join(__dirname, 'app');
+  const configPath = path.join(dirPath, 'config.json');
+  const helpPath = path.join(dirPath, 'help.txt');
+
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath);
+  }
+
+  if (!fs.existsSync(configPath)) {
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  }
+
+  if (!fs.existsSync(helpPath)) {
+    const helpContent = 'This is a help file for the application.';
+    fs.writeFileSync(helpPath, helpContent);
+  }
+
+  console.log('Initialization completed successfully.');
+};
+
+// Handle configuration-related commands
+const handleConfigCommand = (options) => {
+  const config = loadConfig();
+  const [optionName, ...restOptions] = options;
+  switch (optionName) {
+    case '--show':
+      console.log('Current configuration:');
+      console.log(JSON.stringify(config, null, 2));
+      break;
+    case '--reset':
+      saveConfig(defaultConfig);
+      console.log('Configuration reset to default values.');
+      break;
+    case '--set':
+      const [property, ...valueParts] = restOptions;
+      const value = valueParts.join(' ');
+      if (property && value) {
+        config[property] = value;
+        saveConfig(config);
+        console.log('Configuration updated successfully.');
+      } else {
+        console.error('Error: Configuration property and value are required for the "--set" option');
+      }
+      break;
+    default:
+      console.error(`Error: Invalid option "${optionName}" for "config" command`);
+  }
+};
+
+// Handle token-related commands
+const handleTokenCommand = (options) => {
+  const [subCommand, ...subOptions] = options;
+  switch (subCommand) {
+    case '--count':
+      countTokens();
+      break;
+    case '--new':
+      const username = subOptions.join(' ');
+      registerUser(username);
+      break;
+    case '--upd':
+      updateUser(subOptions);
+      break;
+    case '--search':
+      searchUser(subOptions);
+      break;
+    case '--generate-missing':
+      generateMissingTokens();
+      break;
+    default:
+      console.error(`Error: Invalid token sub-command "${subCommand}"`);
+  }
+};
+
+// Count the number of tokens
+const countTokens = () => {
   const users = loadUsers();
-
-  console.log('Current Configuration:');
-  console.log('Config:', config);
-  console.log('Users:', users);
+  console.log(`Number of tokens: ${users.length}`);
 };
 
-//Updating configuration
-const updateConfig = () => {
+// Register a new user
+const registerUser = (username) => {
+  if (!username) {
+    console.error('Error: Username is required');
+    return;
+  }
 
+  const users = loadUsers();
+  const existingUser = users.find(user => user.username === username);
+  if (existingUser) {
+    console.error(`Error: User with username "${username}" already exists`);
+    return;
+  }
+
+  const token = generateToken({ username });
+  const newUser = { username, token };
+  users.push(newUser);
+  saveUsers(users);
+  console.log(`User "${username}" registered successfully. Token: ${token}`);
 };
 
-// Reseting configuration
-const resetConfig = () => {
-  saveConfig(defaultConfig);
-  console.log('Configuration reset to default values successfully!');
+// Update user information
+const updateUser = (options) => {
+  const [field, username, ...valueParts] = options;
+  const value = valueParts.join(' ');
+  if (!username || !value) {
+    console.error('Error: Invalid option format. Expected: <field> <username> <value>');
+    return;
+  }
+
+  const users = loadUsers();
+  const userIndex = users.findIndex(user => user.username === username);
+  if (userIndex === -1) {
+    console.error(`Error: User with username "${username}" not found`);
+    return;
+  }
+
+  const user = users[userIndex];
+  if (field === 'e') {
+    user.email = value;
+  } else if (field === 'p') {
+    user.phone = value;
+  } else {
+    console.error(`Error: Invalid field "${field}". Allowed fields: e (email), p (phone)`);
+    return;
+  }
+
+  users[userIndex] = user;
+  saveUsers(users);
+  console.log(`User "${username}" updated successfully.`);
 };
 
-//Generate user token 
-const generateToken = () => {
-  
+// Search for a user
+const searchUser = (options) => {
+  const [field, value] = options;
+  if (!field || !value) {
+    console.error('Error: Invalid search format. Expected: <field> <value>');
+    return;
+  }
+
+  const users = loadUsers();
+  let matchedUsers;
+
+  if (field === 'u') {
+    matchedUsers = users.filter(user => user.username.includes(value));
+  } else if (field === 'p') {
+    matchedUsers = users.filter(user => user.phone && user.phone.includes(value));
+  } else {
+    console.error(`Error: Invalid search field "${field}". Allowed fields: u (username), p (phone)`);
+    return;
+  }
+
+  if (matchedUsers.length === 0) {
+    console.log(`No users found matching "${value}"`);
+  } else {
+    console.log(`Users matching "${value}":`);
+    matchedUsers.forEach(user => {
+      console.log(`- Username: ${user.username}, Email: ${user.email || 'N/A'}, Phone: ${user.phone || 'N/A'}`);
+    });
+  }
 };
 
-//Updating user contact information
-const addUpdateUser = () => {
+// Generate tokens for existing users without tokens
+const generateMissingTokens = () => {
+  const users = loadUsers();
+  let updated = false;
+  users.forEach(user => {
+    if (!user.token) {
+      user.token = generateToken({ username: user.username });
+      updated = true;
+    }
+  });
+
+  if (updated) {
+    saveUsers(users);
+    console.log('Tokens generated for users without tokens.');
+  } else {
+    console.log('All users already have tokens.');
+  }
 };
 
-//Searching for a user
-const searchUser = () => {
-};
+// Parse the command-line arguments
+const [, , command, ...options] = process.argv;
 
-module.exports = {
-  init,
-  viewConfig,
-  updateConfig,
-  resetConfig,
-  generateToken,
-  addUpdateUser,
-  searchUser
-};
+// Execute the command
+handleCommand(command, options);
+
+
+
+
