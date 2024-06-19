@@ -1,10 +1,24 @@
 [
   {
     "username": "ben_boe",
-    "token": "token_for_ben_boe"
+    "token": "token_for_ben_boe",
+    "phone": "\"9999999990\"",
+    "email": "\"benboe@example.com\""
   },
   {
     "username": "greg_smith",
     "token": "token_for_greg_smith"
+  },
+  {
+    "username": "\"EmmaJoe\"",
+    "token": "99a4eddb09d2506954628800c5c93ce2313504e56c2e16358bee5beec3870a54"
+  },
+  {
+    "username": "\"JamesPeter\"",
+    "token": "12b65fe2dd637b02e22861ce9f328ce1bea73125ccdc9748abdecd1ed0e01723"
+  },
+  {
+    "username": "MarvinShied",
+    "token": "token_for_MarvinShied"
   }
 ]

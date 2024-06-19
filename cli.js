@@ -1,72 +1,39 @@
-//Imported the required modules
+// Importing the 'readline' module from Node.js
 const readline = require('readline');
-const {
-  init,
-  viewConfig,
-  updateConfig,
-  resetConfig,
-  generateToken,
-  addUpdateUser,
-  searchUser
-} = require('./app');
 
+// Creating an interface for reading input and outputting to the console
 const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
+  input: process.stdin,   
+  output: process.stdout, 
 });
 
-//Using menu system to display the different CLI's
-const showMenu = () => {
-  console.log('Welcome to the Application Setup CLI');
-  console.log('Please select an option:');
-  console.log('1. Initialize and configure application');
-  console.log('2. View current configuration');
-  console.log('3. Update configuration');
-  console.log('4. Reset configuration to default');
-  console.log('5. Generate user token');
-  console.log('6. Add/Update user contact information');
-  console.log('7. Search for a user');
-  console.log('8. Exit');
+// This Function handle commands entered by the user
+const handleCommand = (command, options) => {
+  const { spawn } = require('child_process'); 
+  const appProcess = spawn('node', ['app.js', command, ...options]);
 
-  rl.question('Enter your choice: ', (choice) => {
-    switch (choice) {
-      case '1':
-        console.log('Initializing and configuring application...');
-        init();
-        console.log('Initialization and configuration completed successfully!');
-        showMenu();
-        break;
-      case '2':
-        viewConfig();
-        showMenu();
-        break;
-      case '3':
-        updateConfig();
-        showMenu();
-        break;
-      case '4':
-        resetConfig();
-        showMenu();
-        break;
-      case '5':
-        generateToken();
-        break;
-      case '6':
-        addUpdateUser();
-        break;
-      case '7':
-        searchUser();
-        break;
-      case '8':
-        console.log('Exiting...');
-        rl.close();
-        break;
-      default:
-        console.log('Invalid choice. Please try again.');
-        showMenu();
-        break;
+  // Event listeners for standard output, standard error ans close
+  appProcess.stdout.on('data', (data) => {
+    console.log(`${data}`); 
+  });
+  appProcess.stderr.on('data', (data) => {
+    console.error(`${data}`); 
+  });
+  appProcess.on('close', (code) => {
+    if (code !== 0) {
+      console.error(`Process exited with code ${code}`); 
     }
+    askForCommand(); 
   });
 };
 
-showMenu();
+// Function to ask the user for a command
+const askForCommand = () => {
+  rl.question('Enter a command: ', (input) => {
+    const [command, ...options] = input.trim().split(' '); 
+    handleCommand(command, options); 
+  });
+};
+//This logging out messages and starting command input process
+console.log('Welcome to the CLI!'); 
+askForCommand(); 

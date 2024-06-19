@@ -31,11 +31,10 @@ const saveUsers = (users) => {
 const testUsers = [
   { username: 'ben_boe', email: 'ben.boe@example.com', phone: '7234567890' },
   { username: 'ben_pike', email: 'ben.pike@example.com', phone: '1987654321' },
-  { username: 'ben_john', email: 'ben.john@example.com' },
-  { username: 'ben_white', phone: '4551234567' },
-  { username: 'ben_brown' }
-];
-
+  { username: 'ben_john', email: 'ben.john@example.com',phone: '2551234567' },
+  { username: 'ben_white', email: 'ben.white@example.com',phone: '3551234567' },
+  { username: 'ben_brown',email: 'ben.brown@example.com',phone: '1551234567'}
+]
 // Save the test users to the 'users.json' file
 saveUsers(testUsers);
 
