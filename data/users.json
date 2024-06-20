@@ -11,13 +11,23 @@
   },
   {
     "username": "ben_john",
-    "email": "ben.john@example.com"
+    "email": "ben.john@example.com",
+    "phone": "2551234567"
   },
   {
     "username": "ben_white",
-    "phone": "4551234567"
+    "email": "ben.white@example.com",
+    "phone": "3551234567"
   },
   {
-    "username": "ben_brown"
+    "username": "ben_brown",
+    "email": "ben.brown@example.com",
+    "phone": "1551234567"
+  },
+  {
+    "username": "\"ben_pike\""
+  },
+  {
+    "username": "\"ben_john\""
   }
 ]
