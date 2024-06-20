@@ -1,0 +1,6 @@
+{
+  "appName": "MyAppCLI",
+  "version": "1.0.0",
+  "description": "The Command Line Interface(CLI)",
+  "main": "cli.js"
+}
