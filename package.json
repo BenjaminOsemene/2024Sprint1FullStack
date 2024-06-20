@@ -2,7 +2,7 @@
   "name": "2024sprint1fullstack",
   "version": "1.0.0",
   "description": "This is a FullStack JavaScript project for building a simple command line interface that  confirms user account.",
-  "main": "index.js",
+  "main": "cli.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "crypto": "^1.0.1",
+    "crc": "^4.3.2",
+    "date-fns": "^3.6.0",
     "express": "^4.19.2",
     "fs": "^0.0.1-security",
     "path": "^0.12.7"

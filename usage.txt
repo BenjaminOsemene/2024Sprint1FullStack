@@ -1,0 +1,15 @@
+cli <command> <option>
+
+Usage:
+
+
+cli init              initialize the application
+cli status            provides status for initialization and configuration
+
+cli config --show     provides view of the current config file
+cli config --set      update the config file with new values
+cli config --reset    reset the config file back to it's original state
+
+cli token --new <username>     generate a user token based on an end user's username 
+cli token --upd <field> <username> <value>   update user records, email and /or phone number
+cli token --search <field> <value>  search for a user record queried by username,email,or phone
