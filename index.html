@@ -28,23 +28,33 @@
 </head>
 <body>
   <h1>New Membership Registration</h1>
-  <form>
+  <form id="registrationForm">
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required>
     <br><br>
     <button type="button" onclick="generateToken()">Submit</button>
   </form>
   <p id="tokenDisplay"></p>
+  <p id="tokenCount">Tokens generated: 0</p>
 
   <script>
+    let tokenCounter = 0;
+
     function generateToken() {
       const username = document.getElementById('username').value;
 
-      fetch(`/register?username=${username}`, {
-        method: 'POST'
+      fetch('/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username })
       })
       .then(response => response.text())
       .then(token => {
+        tokenCounter++;
+        updateTokenCount();
+        
         const tokenDisplay = document.getElementById('tokenDisplay');
         tokenDisplay.innerHTML = `Your token is: <span id="token">${token}</span>`;
       })
@@ -52,16 +62,11 @@
         console.error('Error:', error);
       });
     }
+
+    function updateTokenCount() {
+      const tokenCountDisplay = document.getElementById('tokenCount');
+      tokenCountDisplay.textContent = `Tokens generated: ${tokenCounter}`;
+    }
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
